@@ -1,6 +1,8 @@
 // import http from "http"
 import dotenv from "dotenv"
 import express from "express"
+import fs from "fs";
+import {format} from "date-fns"
 
 dotenv.config();
 const app = express();
@@ -26,4 +28,19 @@ app.listen(port,()=>{
 //default route
 app.get("/",(req,res)=>{
     res.status(200).send("default page")
+})
+
+app.get("/files",(req,res)=>{
+   let today = format(new Date(),"dd-MM-yy-HH-mm-SS");
+   const filepath=`Timestamp/${today}`;
+   fs.writeFileSync(filepath,`${today}`,"utf-8");
+   let data =fs.readFileSync(filepath,"utf-8");
+
+   try {
+    res.status(200).send(data);
+    
+   } catch (error) {
+    res.status(504).json({message:"failed to create a file"})
+    
+   }
 })
